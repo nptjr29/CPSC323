@@ -15,7 +15,7 @@ string charToString(const char& a)
 	return str;
 }
 
-// Returns the string found at table[rowVal, colVal]
+// Returns the string found at table[rowVal, colVal]; returns "" if not found
 string findInTable(const char& rowVal, const char& colVal, const string table[ROW][COL])
 {
 	int i = 0;
@@ -29,12 +29,12 @@ string findInTable(const char& rowVal, const char& colVal, const string table[RO
 			{
 				if (table[0][j] == charToString(colVal))
 				{
-					temp = table[i][j];
-					return temp;
+					return table[i][j];
 				}
 				else
 					++j;
 			}
+			return "";
 		}
 		else
 			++i;
@@ -107,16 +107,16 @@ int main()
 		if (top != input[i])	// no match found
 		{
 			tmp = findInTable(top, input[i], parseTable);
-			if (tmp != "lambda" && tmp != "0")
+			if (tmp == "0" || tmp == "")	//empty cell or invalid symbol
+			{
+				cout << "Statement is rejected." << endl;
+				done = true;
+			}
+			else if (tmp != "lambda" && tmp != "0")
 			{
 				for (int k = tmp.length() - 1; k >= 0; --k)
 					myStack.push(tmp[k]);		//push in reverse
 				//printStack(myStack);			//print stack after pushing
-			}
-			else if (tmp == "0" || tmp == "")	//empty cell or invalid symbol
-			{
-				cout << "Statement is rejected." << endl;
-				done = true;
 			}
 			tmp = "";	//reset tmp
 		}
