@@ -18,7 +18,8 @@ string charToString(const char& a)
 // Returns the string found at table[rowVal, colVal]
 string findInTable (const char& rowVal, const char& colVal, const string table[ROW][COL])
 {
-	int i = 0, j = 0;
+	int i = 0;
+	int j = 0;
 	string temp = "";
 	while (i < ROW)
 	{
@@ -27,34 +28,42 @@ string findInTable (const char& rowVal, const char& colVal, const string table[R
 			while (j < COL)
 			{
 				if (table[0][j] == charToString(colVal))
+				{
 					temp = table[i][j];
+					return temp;
+				}
 				else
 					++j;
 			}
 		}
-		++i;
+		else
+			++i;
 	}
 	return temp;
 }
 
+// Prints stack without removing items
 void printStack(stack<char>& myStack)
 {
-	char * arr = new char[];
-	int size = myStack.size();
-	cout << "Stack is: ";
-	//stack is {$ E Q}
-	for (int i = 0; i < size; ++i)
+	if (myStack.empty())
+		cout << "Stack is empty.";
+	else
 	{
-		arr[i] = myStack.top();
-		myStack.pop();
-		// array is {Q E $}
-		cout << arr[i] << " ";
-	}
-	for (int i = size - 1; i >= 0; --i)
-	{
-		//stack is {$ E Q}
-		myStack.push(arr[i]);
-	}
+		int size = myStack.size();
+		char * arr = new char[size + 1];		
+		cout << "Stack is: ";
+		for (int i = 0; i < size; ++i)
+		{
+			arr[i] = myStack.top();	
+			myStack.pop();
+		}
+		for (int i = size - 1; i >= 0; --i)
+		{
+			myStack.push(arr[i]);
+			cout << arr[i];
+		}
+		delete[] arr;
+	}	
 	cout << endl;
 }
 
@@ -101,9 +110,9 @@ int main()
 				{
 					for (int k = tmp.length() - 1 ; k >= 0; --k)
 						myStack.push(tmp[k]);		//push in reverse
-					printStack(myStack);			//print stack after pushing
+					//printStack(myStack);			//print stack after pushing
 				}
-				else if (tmp == "0")
+				else if (tmp == "0" || tmp == "")	//empty cell or invalid symbol
 				{
 					cout << "Statement is rejected." << endl;
 					done = true;
@@ -112,6 +121,7 @@ int main()
 			}
 			else	//found a match
 			{
+				printStack(myStack);		//print stack after a match
 				if (input[i] == '$')
 				{
 					cout << "Statement is accepted." << endl;
@@ -123,6 +133,6 @@ int main()
 		}
 
 	cout << endl;
-	system("Pause");  //only needed for visual studio
+	system("Pause");	//only needed for visual studio
 	return 0;
 }
