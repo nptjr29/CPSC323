@@ -11,7 +11,9 @@ using namespace std;
 //return true if there are 2 consecutive spaces
 bool bothAreSpaces(char lhs, char rhs)
 {
-	return (lhs == rhs) && (lhs == ' ');
+	return ((lhs == rhs) && ((lhs == ' ') || (lhs == '\t')))
+		|| ((lhs == '\t') && (rhs == ' ')) 
+		|| ((lhs == ' ') && (rhs == '\t'));
 }
 
 string removeComments(const string& str)
