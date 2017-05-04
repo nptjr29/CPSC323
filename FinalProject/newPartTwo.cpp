@@ -7,6 +7,7 @@ using namespace std;
 
 const int ROW = 23;
 const int COL = 30;
+//Array to check keyword
 bool check[5] = { false };
 
 // Process input file, remove all spaces and carriage return 
