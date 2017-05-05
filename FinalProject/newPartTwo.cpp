@@ -7,8 +7,7 @@ using namespace std;
 
 const int ROW = 23;
 const int COL = 30;
-//Array to check keyword
-bool check[5] = { false };
+bool check[10] = { false };
 
 // Process input file, remove all spaces and carriage return 
 // from file and store it in a string
@@ -46,18 +45,28 @@ string processInputFile()
 			dummyVar = "c";
 			check[3] = true;
 		}
-		else if (dummyVar == "END.") 
+		else if (dummyVar == "END.")
 		{
 			dummyVar = "$";
 			check[4] = true;
 		}
+		else if (dummyVar == "END")
+		{
+			check[5] = true;
+		}
 		input += dummyVar;
 	}
+	ProgramFileInput.close();
 	return input;	
 }
 
 bool checkKeyword()
 {
+	if (check[5])
+	{
+		cout << ". is expected. Program is rejected." << endl;
+		return false;
+	}
 	if (!check[0])
 	{
 		cout << "PROGRAM is expected. Program is rejected." << endl;
@@ -79,6 +88,31 @@ bool checkKeyword()
 		return false;
 	}
 	return true;
+}
+
+void analyzeError(const string& item, const char& rowVal, const char& colVal, const char& input)
+{
+	if (input == 'i' && colVal != ':')
+	{
+		cout << ": is missing.";
+	}
+	else if (check[6])
+	{
+		cout << "; is missing.";
+	}
+	else if (rowVal == '=' || rowVal == ')' || rowVal == '(')
+	{
+		cout << rowVal << " is missing.";
+	}
+	else if (item == "!" || check[7])
+	{
+		cout << "\nIllegal expression.";
+	}
+	else if (item == "")
+	{
+		cout << "\nUnknown identifier.";
+	}
+	cout << " Program is rejected." << endl;
 }
 
 // Converts a character to a string
@@ -153,14 +187,43 @@ void populateTable(string table[ROW][COL])
 
 		}
 	}
+}
 
+void checkMissingSemiColon()
+{
+	fstream ProgramFileInput;
+	ProgramFileInput.open("finalv2.txt", ios_base::in);
+	if (!ProgramFileInput) {
+		cout << "Fail to open program file." << endl;
+		return;
+	}
+	string str = "";
+
+	while (getline(ProgramFileInput, str))
+	{
+		size_t i = str.find(";");
+		if (i == std::string::npos)	// if no ; is found
+		{
+			if (str.find("BEGIN") == std::string::npos && str.find("END.") == std::string::npos)
+				check[6] = true;
+		}
+		else // if ; is found
+		{
+			if (str.find("BEGIN") != std::string::npos || str.find("END.") != std::string::npos)
+				check[7] = true;
+		}
+		str = "";
+	}
+	ProgramFileInput.close();
 }
 
 int main()
 {
 	string input = processInputFile();
+	checkMissingSemiColon();
 	string table[ROW][COL];
 	populateTable(table);
+
 	//Testing parse_table
 	for (int i = 0; i < ROW; i++) {
 		for (int j = 0; j < COL; j++) {
@@ -191,18 +254,11 @@ int main()
 			{
 				tmp = findInTable(top, input[i], table);
 				if (tmp == "!" || tmp == "")	//empty cell or invalid symbol
-				{
-					if (tmp == "!")
-					{
-						cout << "\nIllegal expression. Program is rejected." << endl;
-					}
-					else
-					{
-						cout << "\nUnknown identifier. Program is rejected." << endl;
-					}
-					
-					printStack(myStack);
-					cout << "Trigger: " << tmp << " at [" << top << ", " << input[i] << "]\n";
+				{			
+					printStack(myStack);					
+					//cout << "Input is " << input[i - 1] << endl;
+					//cout << "Trigger: " << tmp << " at [" << top << ", " << input[i] << "]\n";
+					analyzeError(tmp, top, input[i], input[i - 1]);
 					done = true;
 				}
 				else if (tmp != "&")
@@ -218,16 +274,21 @@ int main()
 				printStack(myStack);		//print stack after a match
 				if (input[i] == '$')
 				{
-					cout << "\nProgram is accepted." << endl;
+					if (!myStack.empty() || i < input.length() - 1)	
+					{
+						//stack is not empty or there are things after END.
+						cout << "Illegal expression" << endl;
+					}
+					else
+					{
+						cout << "\nProgram is accepted." << endl;
+					}
 					done = true;
 				}
 				else
 					++i;
 			}
 		}
-	}
-
-		
-	//system("Pause");
+	}		
 	return 0;
 }
